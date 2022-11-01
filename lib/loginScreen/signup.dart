@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-//import 'package:flutter_svg/flutter_svg.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:messenger/loginUI/login.dart';
+import 'package:messenger/home.dart';
+import 'package:messenger/loginScreen/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,7 +29,7 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _reEntryPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String email = '';
@@ -61,18 +60,32 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   static const successSnackBar = SnackBar(
-    content: Text('Post Successful'),
+    content: Text('SignUp Successful'),
     backgroundColor: Colors.green,
   );
 
   static const failedSnackBar = SnackBar(
-    content: Text('Post Failed!'),
+    content: Text('SignUp Failed!'),
     backgroundColor: Colors.red,
   );
 
-  Future signUp() async {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: _emailController.text, password: _passwordController.text);
+  Future signUp(String userEmail, String userPassword) async {
+    try {
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: userEmail, password: userPassword)
+          .then((value) => {
+                ScaffoldMessenger.of(context).showSnackBar(successSnackBar),
+                _emailController.clear(),
+                _passwordController.clear(),
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeScreen())),
+              });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(failedSnackBar);
+    }
   }
 
   @override
@@ -108,8 +121,8 @@ class _SignupPageState extends State<SignupPage> {
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
+                    // name input field
                     Container(
-                      // name input field
                       margin: const EdgeInsets.symmetric(vertical: 5),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 20),
@@ -135,8 +148,8 @@ class _SignupPageState extends State<SignupPage> {
                         },
                       ),
                     ),
+                    // email input field
                     Container(
-                      // email input field
                       margin: const EdgeInsets.symmetric(vertical: 5),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 20),
@@ -164,8 +177,8 @@ class _SignupPageState extends State<SignupPage> {
                         },
                       ),
                     ),
+                    // password input field
                     Container(
-                      // pass input field
                       margin: const EdgeInsets.symmetric(vertical: 5),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 20),
@@ -193,8 +206,8 @@ class _SignupPageState extends State<SignupPage> {
                         },
                       ),
                     ),
+                    // confirm password input field
                     Container(
-                      // confirm pass input field
                       margin: const EdgeInsets.symmetric(vertical: 5),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 20),
@@ -204,10 +217,10 @@ class _SignupPageState extends State<SignupPage> {
                         borderRadius: BorderRadius.circular(29),
                       ),
                       child: TextFormField(
-                        controller: _reEntryPasswordController,
+                        controller: _confirmPasswordController,
                         decoration: const InputDecoration(
                           icon: Icon(Icons.lock),
-                          hintText: 'Re-enter Password',
+                          hintText: 'Confirm Password',
                           border: InputBorder.none,
                         ),
                         obscureText: true,
@@ -226,45 +239,20 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
               const SizedBox(height: 20),
+              // SignUp button
               SizedBox(
-                // Login button
                 height: deviceHeight * 0.06,
                 width: deviceWidht * 0.8,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30),
                   child: ElevatedButton(
                     onPressed: () async {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreen()));
                       if (_formKey.currentState!.validate()) {
-                        // BlogApiData blogApiClass = BlogApiData();
-                        // var name = _nameController.text;
-                        // var email = _emailController.text;
-                        // var password =  _passwordController.text;
+                        var name = _nameController.text;
+                        var email = _emailController.text;
+                        var password = _passwordController.text;
 
-                        // await blogApiClass
-                        //     .registration(
-                        //         name,email,password )
-                        //     .then((value) {
-                        //   if (value.status == 'success') {
-                        //     ScaffoldMessenger.of(context)
-                        //     .showSnackBar(failedSnackBar);
-                        //     _emailController.clear();
-                        //     _passwordController.clear();
-
-                        //     Navigator.push(
-                        //         context,
-                        //         MaterialPageRoute(
-                        //             builder: (context) => const LoginScreen(
-
-                        //                 )));
-                        //   } else {
-                        //     ScaffoldMessenger.of(context)
-                        //     .showSnackBar(failedSnackBar);
-                        //   }
-                        // });
+                        await signUp(email, password);
                       } else {
                         // do something
                       }
@@ -278,6 +266,29 @@ class _SignupPageState extends State<SignupPage> {
                     child: const Text('SIGNUP'),
                   ),
                 ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Already have an account!"),
+                  GestureDetector(
+                      onTap: () async {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginScreen()));
+                      },
+                      child: const Text(
+                        " Login Now",
+                        style: TextStyle(
+                          //decoration: TextDecoration.underline,
+                          color: Colors.blue,
+                        ),
+                      )),
+                ],
               ),
             ],
           ),

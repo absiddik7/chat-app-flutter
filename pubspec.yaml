@@ -43,10 +43,10 @@ dependencies:
   flutter_local_notifications: ^11.0.1
   http: ^0.13.5
   webview_flutter: ^3.0.4
-
-  #firebase database
+  toggle_switch: ^2.0.1
   cloud_firestore: ^4.0.3
   firebase_auth: ^4.1.0
+  flutter_signin_button: ^2.0.0
 
 dev_dependencies:
   flutter_test:

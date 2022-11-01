@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:messenger/home.dart';
-import 'package:messenger/loginUI/signup.dart';
-
+import 'package:messenger/loginScreen/signup.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -36,9 +37,26 @@ class _LoginPageState extends State<LoginPage> {
   String email = '';
 
   static const failedSnackBar = SnackBar(
-    content: Text('Post Failed!'),
+    content: Text('Login Failed!'),
     backgroundColor: Colors.red,
   );
+
+  Future signIn(String userEmail, String userPassword) async {
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: userEmail, password: userPassword)
+          .then((value) => {
+                _emailController.clear(),
+                _passwordController.clear(),
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeScreen())),
+              });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(failedSnackBar);
+    }
+  }
 
 // Do the design here
   @override
@@ -73,8 +91,8 @@ class _LoginPageState extends State<LoginPage> {
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
+                    // email input field
                     Container(
-                      // email input field
                       margin: const EdgeInsets.symmetric(vertical: 5),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 20),
@@ -102,8 +120,8 @@ class _LoginPageState extends State<LoginPage> {
                         },
                       ),
                     ),
+                    // password input field
                     Container(
-                      // password input field
                       margin: const EdgeInsets.symmetric(vertical: 5),
                       padding: const EdgeInsets.symmetric(
                           vertical: 5, horizontal: 20),
@@ -114,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: TextFormField(
                         controller: _passwordController,
+                        obscureText: true,
                         decoration: const InputDecoration(
                           icon: Icon(Icons.lock),
                           hintText: 'Password',
@@ -131,62 +150,24 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 20),
+              // Login button
               SizedBox(
-                // Login button
                 height: deviceHeight * 0.06,
                 width: deviceWidht * 0.8,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30),
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                                  context,
-                                   MaterialPageRoute(
-                                      builder: (context) => const HomeScreen(
-                                            // authToken: token,
-                                           // userId: id,
-                                           // userName: 'name',
-                                          )));
+                    onPressed: () async {
+                      var email = _emailController.text;
+                      var password = _passwordController.text;
 
-                      
-                      //if (_formKey.currentState!.validate()) {
-                      //   BlogApiData blogApiClass = BlogApiData();
-                        
-                       
-                      //   try {
-                      //     await blogApiClass
-                      //         .login(_emailController.text,
-                      //             _passwordController.text)
-                      //         .then((value) {
-                            
-                      //       if (value.status == 'success') {
-                      //         _emailController.clear();
-                      //         _passwordController.clear();
-                      //         var token = value.authorisation!.token;
-                      //         var id = value.user!.id;
-
-                      //         Navigator.push(
-                      //             context,
-                      //             MaterialPageRoute(
-                      //                 builder: (context) => HomeScreen(
-                      //                       authToken: token,
-                      //                       userId: id,
-                      //                       userName: 'name',
-                      //                     )));
-                      //       } else {
-                      //         ScaffoldMessenger.of(context)
-                      //             .showSnackBar(failedSnackBar);
-                      //       }
-                      //     });
-                      //   } catch (e) {
-                      //      ScaffoldMessenger.of(context)
-                      //             .showSnackBar(failedSnackBar);
-                      //     //
-                      //   }
-                      // } else {
-                      //   ScaffoldMessenger.of(context)
-                      //       .showSnackBar(failedSnackBar);
-                      // }
+                      if (_formKey.currentState!.validate()) {
+                        try {
+                          await signIn(email, password);
+                        } catch (e) {
+                          throw Exception(e);
+                        }
+                      } else {}
                     },
                     style: ElevatedButton.styleFrom(
                         elevation: 12.0,
@@ -211,9 +192,9 @@ class _LoginPageState extends State<LoginPage> {
                                 builder: (context) => const SignupScreen()));
                       },
                       child: const Text(
-                        "Sign Up",
+                        " Sign Up",
                         style: TextStyle(
-                          decoration: TextDecoration.underline,
+                          //decoration: TextDecoration.underline,
                           color: Colors.blue,
                         ),
                       ))
@@ -223,38 +204,20 @@ class _LoginPageState extends State<LoginPage> {
               const Text('or'),
               const SizedBox(height: 10),
               SizedBox(
-                
-                // Login button
+                // Google Login button
                 height: deviceHeight * 0.06,
                 width: deviceWidht * 0.8,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(30),
-                  child: ElevatedButton(
-                    
+                  child: SignInButton(
+                    Buttons.GoogleDark,
+                    text: "Sign in with Google",
                     onPressed: () {
-                      Navigator.push(
-                                  context,
-                                   MaterialPageRoute(
-                                      builder: (context) => const HomeScreen(
-                                            // authToken: token,
-                                           // userId: id,
-                                           // userName: 'name',
-                                          )));
-                    
+                      // google sing in method
                     },
-                    style: ElevatedButton.styleFrom(
-                      
-                        elevation: 12.0,
-                        textStyle: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                        )),
-                    child: const Text('Login with Google'),
                   ),
                 ),
               ),
-
-
             ],
           ),
         ),

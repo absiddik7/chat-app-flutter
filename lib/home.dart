@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:messenger/screens/chatsScreen.dart';
 import 'package:messenger/screens/peopleScreen.dart';
-import 'package:messenger/screens/settingScreen.dart';
+import 'package:messenger/screens/profileScreen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   final pages = [
     const ChatsScreen(),
     const PeopleScreen(),
-    const SettingScreen(),
+    const ProfileScreen(),
   ];
 
   @override
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.chat_sharp), label: 'Chats'),
             BottomNavigationBarItem(icon: Icon(Icons.people), label: 'People'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.settings), label: 'Settings'),
+                icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
       ),
