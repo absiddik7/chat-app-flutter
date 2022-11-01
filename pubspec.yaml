@@ -44,9 +44,12 @@ dependencies:
   http: ^0.13.5
   webview_flutter: ^3.0.4
   toggle_switch: ^2.0.1
+
   cloud_firestore: ^4.0.3
   firebase_auth: ^4.1.0
   flutter_signin_button: ^2.0.0
+  firebase_core: ^2.1.1
+  google_sign_in: ^5.4.2
 
 dev_dependencies:
   flutter_test:

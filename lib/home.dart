@@ -71,8 +71,7 @@ class _HomePageState extends State<HomePage> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.chat_sharp), label: 'Chats'),
             BottomNavigationBarItem(icon: Icon(Icons.people), label: 'People'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.person), label: 'Profile'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
       ),

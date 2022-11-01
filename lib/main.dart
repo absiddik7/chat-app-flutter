@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:messenger/loginScreen/login.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:messenger/mainScreen.dart';
 
 class PostHttpOverrides extends HttpOverrides{
   @override
@@ -23,13 +24,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    
+      
     return const MaterialApp(
       // title: 'Messenger',
       // theme: ThemeData(
       //   primarySwatch: Colors.blue,
       // ),
-      home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
+      home: MainScreen(),
     );
   }
 }

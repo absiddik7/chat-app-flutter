@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger/loginScreen/login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -72,6 +73,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       leading: const Icon(Icons.logout),
                       title: GestureDetector(
                           onTap: () async {
+                            final googleSignIn = GoogleSignIn();
+                            await googleSignIn.signOut();
                             FirebaseAuth.instance.signOut().then((value) {
                               Navigator.push(context,MaterialPageRoute(builder: (context)=> const LoginScreen()));
                             });

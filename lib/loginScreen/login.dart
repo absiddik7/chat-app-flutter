@@ -2,10 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:flutter/services.dart';
 import 'package:messenger/home.dart';
 import 'package:messenger/loginScreen/signup.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -58,7 +60,33 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-// Do the design here
+  Future googleSignIn() async {
+    final googleSignIn = GoogleSignIn();
+    final googleAccount =
+        await googleSignIn.signIn().catchError((onError) => print(onError));
+    
+    GoogleSignInAccount? user;
+
+    try {
+      if (googleAccount != null) {
+        user = googleAccount;
+        final googleAuth = await googleAccount.authentication;
+
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+          accessToken: googleAuth.accessToken,
+        );
+        await FirebaseAuth.instance.signInWithCredential(credential);
+      } else {
+        return;
+      }
+    } on PlatformException catch (err) {
+      // Handle err
+    } catch (err) {
+      // other types of Exceptions
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceHeight = MediaQuery.of(context).size.height;
@@ -66,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             //mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -212,7 +241,13 @@ class _LoginPageState extends State<LoginPage> {
                   child: SignInButton(
                     Buttons.GoogleDark,
                     text: "Sign in with Google",
-                    onPressed: () {
+                    onPressed: () async {
+                      try {
+                        await googleSignIn();
+                      } catch (e) {
+                        print(e);
+                      }
+
                       // google sing in method
                     },
                   ),
