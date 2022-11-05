@@ -3,16 +3,20 @@ import 'dart:io';
 import 'package:messenger/loginScreen/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:messenger/mainScreen.dart';
+import 'package:uuid/uuid.dart';
 
-class PostHttpOverrides extends HttpOverrides{
+class PostHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(context){
+  HttpClient createHttpClient(context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port)=> true;
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
-void main() async{
+var uuid = const Uuid();
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
@@ -24,7 +28,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-      
     return const MaterialApp(
       // title: 'Messenger',
       // theme: ThemeData(

@@ -1,4 +1,13 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:messenger/main.dart';
+import 'package:messenger/model/chatRoomModel.dart';
+import 'package:messenger/model/userModel.dart';
+import 'package:messenger/screens/chatRoomScreen.dart';
+import 'dart:convert';
 
 class PeopleScreen extends StatefulWidget {
   const PeopleScreen({super.key});
@@ -8,154 +17,69 @@ class PeopleScreen extends StatefulWidget {
 }
 
 class _PeopleScreenState extends State<PeopleScreen> {
+  var userData = FirebaseFirestore.instance.collection('users').snapshots();
+
+  // @override
+  // void initState() {
+  //   currentUser();
+  //   super.initState();
+  //   setState(() {
+  //     //getUserData();
+  //   });
+  // }
+  
+
+  currentUser()  async{
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    final uid = user?.uid;
+
+    DocumentSnapshot userInfo =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    UserModel userModel =
+        UserModel.fromJson(userInfo.data() as Map<String, dynamic>);
+
+    return userModel;
+  }
+
+  Future<ChatRoomModel?> getChatRoomModel(UserModel targetUser) async {
+    ChatRoomModel? chatRoom;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    final uid = user?.uid;
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('chatrooms')
+        .where('participants.$uid', isEqualTo: true)
+        .where('participants.${targetUser.userId}', isEqualTo: true)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      // fetch exiting chatroom
+      var docData = snapshot.docs[0].data();
+      ChatRoomModel existingChatroom =
+          ChatRoomModel.fromMap(docData as Map<String, dynamic>);
+
+      chatRoom = existingChatroom;
+    } else {
+      // create new chatroom
+      ChatRoomModel newChatroom =
+          ChatRoomModel(chatroomid: uuid.v1(), lastMessage: "", participants: {
+        uid.toString(): true,
+        targetUser.userId.toString(): true,
+      });
+
+      await FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(newChatroom.chatroomid)
+          .set(newChatroom.toMap());
+      chatRoom = newChatroom;
+    }
+
+    return chatRoom;
+  }
+
   @override
   Widget build(BuildContext context) {
-    List user = [
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-      },
-    ];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -184,23 +108,53 @@ class _PeopleScreenState extends State<PeopleScreen> {
                 ),
               ),
             ),
-            ListView.builder(
-              // padding: const EdgeInsets.symmetric(vertical: 25),
-              shrinkWrap: true,
-              itemCount: user.length,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                return ListTile(
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-                  leading: CircleAvatar(
-                    radius: 25,
-                    backgroundImage: NetworkImage(user[index]['img']),
-                  ),
-                  title: Text(user[index]['name']),
-                );
-              },
-            )
+            StreamBuilder(
+                stream: userData,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const CircularProgressIndicator();
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data?.docs.length,
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      UserModel tappedUser = UserModel(
+                        userId: snapshot.data?.docs[index]['userId'],
+                        name: snapshot.data?.docs[index]['name'],
+                        email: snapshot.data?.docs[index]['email'],
+                      );
+
+                      return ListTile(
+                        onTap: () async {
+                          ChatRoomModel? chatroomModel =
+                              await getChatRoomModel(tappedUser);
+
+                          if (chatroomModel != null) {
+                            // ignore: use_build_context_synchronously
+                            Navigator.pop(context);
+                            // ignore: use_build_context_synchronously
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ChatRoomScreen(
+                                          targetUser: tappedUser,
+                                          chatRoom: chatroomModel,
+                                        )));
+                          }
+                        },
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        leading: const CircleAvatar(
+                          radius: 25,
+                          backgroundImage: NetworkImage(
+                              'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg'),
+                        ),
+                        title: Text(snapshot.data?.docs[index]['name']),
+                      );
+                    },
+                  );
+                })
           ],
         ),
       ),

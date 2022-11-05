@@ -3,6 +3,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:messenger/home.dart';
 import 'package:messenger/loginScreen/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
@@ -69,12 +70,21 @@ class _SignupPageState extends State<SignupPage> {
     backgroundColor: Colors.red,
   );
 
-  Future signUp(String userEmail, String userPassword) async {
+  // user sign up
+  Future signUp(String name, String userEmail, String userPassword) async {
     try {
+
+
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: userEmail, password: userPassword)
           .then((value) => {
+                // add user details
+                FirebaseAuth.instance.currentUser?.uid,
+                addUserDetails(
+                    FirebaseAuth.instance.currentUser!.uid, name, userEmail),
+
+
                 ScaffoldMessenger.of(context).showSnackBar(successSnackBar),
                 _emailController.clear(),
                 _passwordController.clear(),
@@ -88,6 +98,21 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
+  Future addUserDetails(
+      String userId, String userName, String userEmail) async {
+    try {
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      await users.doc(userId).set({
+        'userId': userId,
+        'name': userName,
+        'email': userEmail,
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final deviceHeight = MediaQuery.of(context).size.height;
@@ -97,7 +122,6 @@ class _SignupPageState extends State<SignupPage> {
       body: Center(
         child: SingleChildScrollView(
           child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               const SizedBox(
                 height: 20,
@@ -252,7 +276,7 @@ class _SignupPageState extends State<SignupPage> {
                         var email = _emailController.text;
                         var password = _passwordController.text;
 
-                        await signUp(email, password);
+                        await signUp(name, email, password);
                       } else {
                         // do something
                       }
