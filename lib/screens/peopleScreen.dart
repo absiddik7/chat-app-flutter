@@ -27,9 +27,8 @@ class _PeopleScreenState extends State<PeopleScreen> {
   //     //getUserData();
   //   });
   // }
-  
 
-  currentUser()  async{
+  currentUser() async {
     final FirebaseAuth auth = FirebaseAuth.instance;
     final user = auth.currentUser;
     final uid = user?.uid;
@@ -131,8 +130,6 @@ class _PeopleScreenState extends State<PeopleScreen> {
                               await getChatRoomModel(tappedUser);
 
                           if (chatroomModel != null) {
-                            // ignore: use_build_context_synchronously
-                            Navigator.pop(context);
                             // ignore: use_build_context_synchronously
                             Navigator.push(
                                 context,

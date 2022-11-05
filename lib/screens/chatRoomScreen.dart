@@ -8,15 +8,10 @@ import 'package:messenger/model/userModel.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   const ChatRoomScreen(
-      {super.key,
-      required this.targetUser,
-      //required this.userModel,
-      required this.chatRoom});
+      {super.key, required this.targetUser, required this.chatRoom});
 
   final UserModel targetUser;
-  //final UserModel userModel;
   final ChatRoomModel chatRoom;
-  //final User firebaseUser;
 
   @override
   State<ChatRoomScreen> createState() => _ChatRoomScreenState();
@@ -25,7 +20,7 @@ class ChatRoomScreen extends StatefulWidget {
 class _ChatRoomScreenState extends State<ChatRoomScreen> {
   TextEditingController messageController = TextEditingController();
 
-  currentUser() async {
+  currentUser() {
     final FirebaseAuth auths = FirebaseAuth.instance;
     final user = auths.currentUser;
     final uid = user?.uid;
@@ -45,7 +40,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         createdon: DateTime.now(),
       );
       FirebaseFirestore.instance
-          .collection("chatsroom")
+          .collection("chatrooms")
           .doc(widget.chatRoom.chatroomid)
           .collection('messages')
           .doc(newMessage.messageid)
@@ -55,6 +50,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var messeges = FirebaseFirestore.instance
+        .collection("chatrooms")
+        .doc(widget.chatRoom.chatroomid)
+        .collection('messages')
+        .orderBy("createdon", descending: true)
+        .snapshots();
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -75,19 +77,83 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         children: [
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: StreamBuilder(
+                  stream: messeges,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.active) {
+                      if (snapshot.hasData) {
+                        QuerySnapshot dataSnapshot =
+                            snapshot.data as QuerySnapshot;
+
+                        return ListView.builder(
+                            reverse: true,
+                            itemCount: dataSnapshot.docs.length,
+                            itemBuilder: ((context, index) {
+                              MessageModel currentMessage =
+                                  MessageModel.fromMap(dataSnapshot.docs[index]
+                                      .data() as Map<String, dynamic>);
+
+                              return Row(
+                                mainAxisAlignment:
+                                    (currentMessage.sender == currentUser())
+                                        ? MainAxisAlignment.end
+                                        : MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                        color: (currentMessage.sender ==
+                                                currentUser())
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        currentMessage.text.toString(),
+                                        style: const TextStyle(
+                                            fontSize: 15, color: Colors.white),
+                                      )),
+                                ],
+                              );
+                            }));
+                      } else if (snapshot.hasError) {
+                        return const Center(
+                          child: Text('Something Wrong!'),
+                        );
+                      } else {
+                        return const Center(
+                          child: Text('Say hi!'),
+                        );
+                      }
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  }),
             ),
           ),
           Container(
-            color: Colors.grey[200],
+            
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Row(
               children: [
-                TextField(
-                  controller: messageController,
-                  maxLines: null,
-                  decoration: const InputDecoration(
-                      border: InputBorder.none, hintText: "Enter message"),
+                Flexible(
+                  child: TextField(
+                    controller: messageController,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                        border: InputBorder.none, hintText: "Message"),
+                  ),
                 ),
                 IconButton(
                   onPressed: () {
