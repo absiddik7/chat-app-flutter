@@ -131,7 +131,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       }
                     } else {
                       return const Center(
-                        child: CircularProgressIndicator(),
+                        //child: CircularProgressIndicator(),
                       );
                     }
                   }),
