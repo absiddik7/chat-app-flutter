@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:messenger/loginScreen/login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-//import 'package:messenger/model/userModel.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -14,6 +18,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isSwitched = true;
+  bool isLoading = false;
 
   //UserModel userModel = UserModel();
   String userId = '';
@@ -27,6 +32,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       //getUserData();
     });
+  }
+
+  currentUser() {
+    final FirebaseAuth auths = FirebaseAuth.instance;
+    final user = auths.currentUser;
+    final uid = user?.uid;
+
+    return uid;
   }
 
   getUserData() async {
@@ -57,6 +70,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         return const Center(
           child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
+  File? imageFile;
+  CroppedFile? croppedImage;
+
+  void selectImage(ImageSource imageSource) async {
+    final ImagePicker picker = ImagePicker();
+    final image = await picker.pickImage(source: imageSource);
+
+    if (image != null) {
+      //cropImage(image);
+      imageFile = File(image.path);
+    }
+  }
+
+  void cropImage(XFile imageFile) async {
+    CroppedFile? croppedImage = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+    );
+    if (croppedImage != null) {
+      setState(() {
+        //croppedImage = croppedImage;
+        //imageFile = File(croppedImage.path);
+      });
+    }
+  }
+
+  uploadImage() async {
+    isLoading = true;
+    if (imageFile != null) {
+      UploadTask upoadTask = FirebaseStorage.instance
+          .ref("profilepictures")
+          .child(currentUser())
+          .putFile(imageFile!);
+
+      TaskSnapshot snapshot = await upoadTask;
+      String? imageUrl = await snapshot.ref.getDownloadURL();
+      FirebaseFirestore.instance.collection('users').doc(currentUser()).update({
+        'profilepic': imageUrl,
+      }).whenComplete(() => setState(() {
+            isLoading = false;
+          }));
+    }
+  }
+
+  photoChoosOption() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Upload Profile Photo'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                ListTile(
+                  onTap: () {
+                    selectImage(ImageSource.gallery);
+                    Navigator.of(context).pop();
+                  },
+                  leading: const Icon(Icons.photo_album),
+                  title: const Text('Choose from Gallary'),
+                ),
+                ListTile(
+                  onTap: () {
+                    selectImage(ImageSource.camera);
+                    Navigator.of(context).pop();
+                  },
+                  leading: const Icon(Icons.camera),
+                  title: const Text('Take Photo'),
+                ),
+              ],
+            ),
+          ),
+          // actions: <Widget>[
+          //   TextButton(
+          //     child: const Text('Approve'),
+          //     onPressed: () {
+          //       Navigator.of(context).pop();
+          //     },
+          //   ),
+          // ],
         );
       },
     );
@@ -100,10 +198,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: GestureDetector(
                       onTap: () {
                         // update profile pic
+                        photoChoosOption();
                       },
-                      child: CircleAvatar(
-                        radius: 55,
-                        backgroundImage: NetworkImage(data['profilepic']),
+                      child: Container(
+                        child: (isLoading)
+                            ? const CircularProgressIndicator()
+                            : CircleAvatar(
+                                radius: 55,
+                                backgroundImage:
+                                    NetworkImage(data['profilepic']),
+                              ),
                       ),
                     )),
                     const SizedBox(height: 10),
@@ -123,6 +227,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       itemBuilder: (context, index) {
                         return Column(
                           children: [
+                            TextButton(
+                                onPressed: () async {
+                                  await uploadImage();
+                                },
+                                child: const Text('save')),
                             ListTile(
                               leading: const Icon(
                                 Icons.circle,

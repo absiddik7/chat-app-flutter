@@ -142,10 +142,10 @@ class _PeopleScreenState extends State<PeopleScreen> {
                         },
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 5),
-                        leading: const CircleAvatar(
+                        leading: CircleAvatar(
                           radius: 25,
                           backgroundImage: NetworkImage(
-                              'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg'),
+                              snapshot.data?.docs[index]['profilepic']),
                         ),
                         title: Text(snapshot.data?.docs[index]['name']),
                       );

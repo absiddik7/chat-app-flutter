@@ -45,12 +45,20 @@ dependencies:
   webview_flutter: ^3.0.4
   toggle_switch: ^2.0.1
 
-  cloud_firestore: ^4.0.3
-  firebase_auth: ^4.1.0
-  flutter_signin_button: ^2.0.0
-  firebase_core: ^2.1.1
-  google_sign_in: ^5.4.2
-  uuid: ^3.0.6
+  cloud_firestore: 4.0.4
+  firebase_auth: 4.1.0
+  flutter_signin_button: 2.0.0
+  firebase_core: 2.1.1
+  google_sign_in: 5.4.2
+  uuid: 3.0.6
+  image_picker: 0.8.6
+  image_cropper: 3.0.1
+  firebase_storage: 11.0.4
+  firebase_core_platform_interface: 4.5.2
+
+  #firebase_core_platform_interface: 4.5.1 # note removed ^
+  #firebase_messaging: ^13.0.4 # previously I only had this which was pulling in 4.5.2 which you do not want
+
 
 dev_dependencies:
   flutter_test:

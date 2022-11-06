@@ -100,10 +100,10 @@ class _ChatsScreenState extends State<ChatsScreen> {
                                                       chatRoom: chatRoomModel,
                                                     )));
                                       },
-                                      leading: const CircleAvatar(
+                                      leading: CircleAvatar(
                                         radius: 25,
                                         backgroundImage: NetworkImage(
-                                            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg'),
+                                            targetUser.profilepic.toString()),
                                       ),
                                       title: Text(targetUser.name.toString()),
                                       subtitle: (chatRoomModel.lastMessage

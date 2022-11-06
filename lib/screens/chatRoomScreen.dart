@@ -70,8 +70,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           children: [
             CircleAvatar(
               backgroundColor: Colors.grey[300],
-              backgroundImage: const NetworkImage(
-                  'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg'),
+              backgroundImage:  NetworkImage(
+                 widget.targetUser.profilepic.toString()),
             ),
             const SizedBox(
               width: 10,
