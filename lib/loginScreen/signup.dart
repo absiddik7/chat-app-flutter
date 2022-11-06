@@ -73,8 +73,6 @@ class _SignupPageState extends State<SignupPage> {
   // user sign up
   Future signUp(String name, String userEmail, String userPassword) async {
     try {
-
-
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: userEmail, password: userPassword)
@@ -107,6 +105,7 @@ class _SignupPageState extends State<SignupPage> {
         'userId': userId,
         'name': userName,
         'email': userEmail,
+        'profilepic':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGIItLko5CxR0mnm4afjCns7hzcGyJ_TXOErxPosjyr-HEWLNx6KmXq9_hywYIWIFuueM&usqp=CAU',
       });
     } catch (e) {
       print(e);

@@ -39,12 +39,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         seen: false,
         createdon: DateTime.now(),
       );
+
       FirebaseFirestore.instance
           .collection("chatrooms")
           .doc(widget.chatRoom.chatroomid)
           .collection('messages')
           .doc(newMessage.messageid)
           .set(newMessage.toMap());
+
+      widget.chatRoom.lastMessage = msg;
+      FirebaseFirestore.instance
+          .collection("chatrooms")
+          .doc(widget.chatRoom.chatroomid)
+          .set(widget.chatRoom.toMap());
     }
   }
 
@@ -131,14 +138,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       }
                     } else {
                       return const Center(
-                        //child: CircularProgressIndicator(),
-                      );
+                          //child: CircularProgressIndicator(),
+                          );
                     }
                   }),
             ),
           ),
           Container(
-            
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
             margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             decoration: BoxDecoration(

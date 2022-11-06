@@ -50,11 +50,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (snapshot.connectionState == ConnectionState.done) {
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          print('name: ${data['name']}');
           setState(() {
             userName = data['name'];
           });
-          // return Text("Full Name: ${data['name']} ${data['email']}");
         }
 
         return const Center(
@@ -66,7 +64,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-// builder
     CollectionReference users = FirebaseFirestore.instance.collection('users');
     final FirebaseAuth auth = FirebaseAuth.instance;
     final user = auth.currentUser;
@@ -86,31 +83,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
           builder:
               (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
             if (snapshot.hasError) {
-              return const Text("Something went wrongggggg");
+              return const Text("Something went wrong!");
             }
 
             if (snapshot.hasData && !snapshot.data!.exists) {
-              return const Text("Document does not exist");
+              return const Text("User does not exist!");
             }
             if (snapshot.connectionState == ConnectionState.done) {
               Map<String, dynamic> data =
                   snapshot.data!.data() as Map<String, dynamic>;
-              print('name: ${data['name']}');
-              // setState(() {
-              //   userName = data['name'];
-              // });
-              // return Text("Full Name: ${data['name']} ${data['email']}");
 
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    const Center(
+                    Center(
+                        child: GestureDetector(
+                      onTap: () {
+                        // update profile pic
+                      },
                       child: CircleAvatar(
                         radius: 55,
-                        backgroundImage: NetworkImage(
-                            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg'),
+                        backgroundImage: NetworkImage(data['profilepic']),
                       ),
-                    ),
+                    )),
                     const SizedBox(height: 10),
                     //user name
                     Center(
@@ -133,6 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Icons.circle,
                                 color: Colors.green,
                               ),
+                              // active button
                               title: const Text('Active Status',
                                   style: TextStyle(
                                     fontSize: 20,
@@ -149,6 +145,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 activeColor: Colors.blue,
                               ),
                             ),
+                            // Logout button
                             ListTile(
                               leading: const Icon(Icons.logout),
                               title: GestureDetector(

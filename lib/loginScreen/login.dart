@@ -8,6 +8,7 @@ import 'package:messenger/loginScreen/signup.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -64,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
     final googleSignIn = GoogleSignIn();
     final googleAccount =
         await googleSignIn.signIn().catchError((onError) => print(onError));
-    
+
     GoogleSignInAccount? user;
 
     try {
@@ -76,7 +77,23 @@ class _LoginPageState extends State<LoginPage> {
           idToken: googleAuth.idToken,
           accessToken: googleAuth.accessToken,
         );
-        await FirebaseAuth.instance.signInWithCredential(credential);
+
+        await FirebaseAuth.instance
+            .signInWithCredential(credential)
+            .whenComplete(() {
+          FirebaseAuth.instance.authStateChanges().listen((User? user) {
+            if (user == null) {
+              print('User is currently signed out!');
+            } else {
+              String uid = user.uid;
+              String? email = user.email;
+              String? name = user.displayName;
+              String? profilePic = user.photoURL;
+
+              addUserDetails(uid, name!, email!, profilePic!);
+            }
+          });
+        });
       } else {
         return;
       }
@@ -84,6 +101,22 @@ class _LoginPageState extends State<LoginPage> {
       // Handle err
     } catch (err) {
       // other types of Exceptions
+    }
+  }
+
+  Future addUserDetails(
+      String userId, String userName, String userEmail, String profilePic) async {
+    try {
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      await users.doc(userId).set({
+        'userId': userId,
+        'name': userName,
+        'email': userEmail,
+        'profilepic':profilePic,
+      });
+    } catch (e) {
+      print(e);
     }
   }
 

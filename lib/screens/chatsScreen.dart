@@ -1,4 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:messenger/db/firebaseHandler.dart';
+import 'package:messenger/model/chatRoomModel.dart';
+import 'package:messenger/model/userModel.dart';
+import 'package:messenger/screens/chatRoomScreen.dart';
 
 class ChatsScreen extends StatefulWidget {
   const ChatsScreen({super.key});
@@ -8,184 +14,21 @@ class ChatsScreen extends StatefulWidget {
 }
 
 class _ChatsScreenState extends State<ChatsScreen> {
+  currentUser() {
+    final FirebaseAuth auths = FirebaseAuth.instance;
+    final user = auths.currentUser;
+    final uid = user?.uid;
+
+    return uid;
+  }
+
   @override
   Widget build(BuildContext context) {
-    List user = [
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-        "msgTitle": 'How are you',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-        "msgTitle": 'Meta is rocks! chill',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-        "msgTitle": 'what is your name buddy?',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-        "msgTitle": 'I will distroy Russia',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-        "msgTitle": 'I will distroy USA',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-        "msgTitle": 'How are you',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-        "msgTitle": 'Meta is rocks! chill',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-        "msgTitle": 'what is your name buddy?',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-        "msgTitle": 'I will distroy Russia',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-        "msgTitle": 'I will distroy USA',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-        "msgTitle": 'How are you',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-        "msgTitle": 'Meta is rocks! chill',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-        "msgTitle": 'what is your name buddy?',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-        "msgTitle": 'I will distroy Russia',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-        "msgTitle": 'I will distroy USA',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-        "msgTitle": 'How are you',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-        "msgTitle": 'Meta is rocks! chill',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-        "msgTitle": 'what is your name buddy?',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-        "msgTitle": 'I will distroy Russia',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-        "msgTitle": 'I will distroy USA',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-        "msgTitle": 'How are you',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-        "msgTitle": 'Meta is rocks! chill',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-        "msgTitle": 'what is your name buddy?',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-        "msgTitle": 'I will distroy Russia',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-        "msgTitle": 'I will distroy USA',
-      },
-      {
-        "img":
-            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg',
-        "name": 'Bill Gates',
-        "msgTitle": 'How are you',
-      },
-      {
-        "img":
-            'https://i.insider.com/635a60e9ea35650019e0694c?width=1136&format=jpeg',
-        "name": 'Mark Zuckerberg',
-        "msgTitle": 'Meta is rocks! chill',
-      },
-      {
-        "img":
-            'https://media.istockphoto.com/photos/headshot-portrait-of-smiling-male-employee-in-office-picture-id1309328823?k=20&m=1309328823&s=612x612&w=0&h=RqA2lYygvOxisNPp6UwFjz7bCw_rYITJMqFTMSrhpis=',
-        "name": 'John Don',
-        "msgTitle": 'what is your name buddy?',
-      },
-      {
-        "img":
-            'https://media-cldnry.s-nbcnews.com/image/upload/t_nbcnews-fp-1200-630,f_auto,q_auto:best/rockcms/2022-06/220610-donald-trump-2020-ac-432p-5730d1.jpg',
-        "name": 'Donald Trump',
-        "msgTitle": 'I will distroy Russia',
-      },
-      {
-        "img": 'https://static.dw.com/image/63157554_605.jpg',
-        "name": 'Vladimir Putin',
-        "msgTitle": 'I will distroy USA',
-      },
-    ];
+    var chats = FirebaseFirestore.instance
+        .collection("chatrooms")
+        .where("participants.${currentUser()}", isEqualTo: true)
+        .snapshots();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -214,21 +57,91 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 ),
               ),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: user.length,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    radius: 25,
-                    backgroundImage: NetworkImage(user[index]['img']),
-                  ),
-                  title: Text(user[index]['name']),
-                  subtitle: Text(user[index]['msgTitle']),
-                );
-              },
-            )
+            StreamBuilder(
+                stream: chats,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.active) {
+                    if (snapshot.hasData) {
+                      QuerySnapshot chatRoomSnapshot =
+                          snapshot.data as QuerySnapshot;
+
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: chatRoomSnapshot.docs.length,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          ChatRoomModel chatRoomModel = ChatRoomModel.fromMap(
+                              chatRoomSnapshot.docs[index].data()
+                                  as Map<String, dynamic>);
+
+                          Map<String, dynamic> participants =
+                              chatRoomModel.participants!;
+
+                          List participantsKeys = participants.keys.toList();
+                          participantsKeys.remove(currentUser());
+
+                          return FutureBuilder(
+                              future: FirebaseHandler.getUserModelById(
+                                  participantsKeys[0]),
+                              builder: (context, userData) {
+                                if (userData.connectionState ==
+                                    ConnectionState.done) {
+                                  if (userData.data != null) {
+                                    UserModel targetUser =
+                                        userData.data as UserModel;
+                                    return ListTile(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ChatRoomScreen(
+                                                      targetUser: targetUser,
+                                                      chatRoom: chatRoomModel,
+                                                    )));
+                                      },
+                                      leading: const CircleAvatar(
+                                        radius: 25,
+                                        backgroundImage: NetworkImage(
+                                            'https://pbs.twimg.com/profile_images/1564398871996174336/M-hffw5a_400x400.jpg'),
+                                      ),
+                                      title: Text(targetUser.name.toString()),
+                                      subtitle: (chatRoomModel.lastMessage
+                                                  .toString() !=
+                                              "")
+                                          ? Text(chatRoomModel.lastMessage
+                                              .toString())
+                                          : const Text(
+                                              'Say hi to new friend!',
+                                              style: TextStyle(
+                                                color: Colors.blue,
+                                              ),
+                                            ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                } else {
+                                  return Container();
+                                }
+                              });
+                        },
+                      );
+                    } else if (snapshot.hasError) {
+                      return const Center(
+                        child: Text('Something Wrong!'),
+                      );
+                    } else {
+                      return const Center(
+                        child: Text('No chats!'),
+                      );
+                    }
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                })
           ],
         ),
       ),
