@@ -66,10 +66,11 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.grey[300],
+              backgroundColor: Colors.grey[500],
               backgroundImage:  NetworkImage(
                  widget.targetUser.profilepic.toString()),
             ),
