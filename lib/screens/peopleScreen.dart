@@ -1,8 +1,8 @@
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:messenger/db/firebaseHandler.dart';
 import 'package:messenger/main.dart';
 import 'package:messenger/model/chatRoomModel.dart';
 import 'package:messenger/model/userModel.dart';
@@ -17,28 +17,11 @@ class PeopleScreen extends StatefulWidget {
 }
 
 class _PeopleScreenState extends State<PeopleScreen> {
-  var userData = FirebaseFirestore.instance.collection('users').snapshots();
-
-  // @override
-  // void initState() {
-  //   currentUser();
-  //   super.initState();
-  //   setState(() {
-  //     //getUserData();
-  //   });
-  // }
-
-  currentUser() async {
-    final FirebaseAuth auth = FirebaseAuth.instance;
-    final user = auth.currentUser;
+  currentUser() {
+    final FirebaseAuth auths = FirebaseAuth.instance;
+    final user = auths.currentUser;
     final uid = user?.uid;
-
-    DocumentSnapshot userInfo =
-        await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    UserModel userModel =
-        UserModel.fromJson(userInfo.data() as Map<String, dynamic>);
-
-    return userModel;
+    return uid;
   }
 
   Future<ChatRoomModel?> getChatRoomModel(UserModel targetUser) async {
@@ -79,6 +62,13 @@ class _PeopleScreenState extends State<PeopleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var userData = FirebaseFirestore.instance
+        .collection('users')
+        .where("userId", isNotEqualTo: currentUser())
+        .snapshots();
+    List<UserModel> allUsers = [];
+    List ids = [];
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -100,6 +90,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                 borderRadius: BorderRadius.circular(29),
               ),
               child: const TextField(
+                textInputAction: TextInputAction.go,
                 decoration: InputDecoration(
                   icon: Icon(Icons.search),
                   hintText: 'Search',
@@ -118,37 +109,63 @@ class _PeopleScreenState extends State<PeopleScreen> {
                     itemCount: snapshot.data?.docs.length,
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, index) {
+                      UserModel userModel = UserModel.fromJson(
+                          snapshot.data?.docs[index].data()
+                              as Map<String, dynamic>);
+
+                      allUsers.add(userModel);
+                      ids.add(userModel.userId);
+
                       UserModel tappedUser = UserModel(
                         userId: snapshot.data?.docs[index]['userId'],
                         name: snapshot.data?.docs[index]['name'],
                         email: snapshot.data?.docs[index]['email'],
                       );
 
-                      return ListTile(
-                        onTap: () async {
-                          ChatRoomModel? chatroomModel =
-                              await getChatRoomModel(tappedUser);
+                      return FutureBuilder(
+                          future: FirebaseHandler.getUserModelById(ids[index]),
+                          builder: (context, userSnapshot) {
+                            if (userSnapshot.connectionState ==
+                                ConnectionState.done) {
+                              if (userSnapshot.data != null) {
+                                UserModel users = UserModel();
+                                if (userSnapshot.data?.userId !=
+                                    currentUser()) {
+                                  users = userSnapshot.data as UserModel;
+                                }
+                                return ListTile(
+                                  onTap: () async {
+                                    ChatRoomModel? chatroomModel =
+                                        await getChatRoomModel(tappedUser);
 
-                          if (chatroomModel != null) {
-                            // ignore: use_build_context_synchronously
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ChatRoomScreen(
-                                          targetUser: tappedUser,
-                                          chatRoom: chatroomModel,
-                                        )));
-                          }
-                        },
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
-                        leading: CircleAvatar(
-                          radius: 25,
-                          backgroundImage: NetworkImage(
-                              snapshot.data?.docs[index]['profilepic']),
-                        ),
-                        title: Text(snapshot.data?.docs[index]['name']),
-                      );
+                                    if (chatroomModel != null) {
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ChatRoomScreen(
+                                                    targetUser: tappedUser,
+                                                    chatRoom: chatroomModel,
+                                                  )));
+                                    }
+                                  },
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 5),
+                                  leading: CircleAvatar(
+                                    radius: 25,
+                                    backgroundImage: NetworkImage(
+                                        users.profilepic.toString()),
+                                  ),
+                                  title: Text(users.name.toString()),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            } else {
+                              return Container();
+                            }
+                          });
                     },
                   );
                 })
