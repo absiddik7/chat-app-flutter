@@ -17,6 +17,9 @@ class PeopleScreen extends StatefulWidget {
 }
 
 class _PeopleScreenState extends State<PeopleScreen> {
+  final searchController = TextEditingController();
+  var searchItem = '';
+
   currentUser() {
     final FirebaseAuth auths = FirebaseAuth.instance;
     final user = auths.currentUser;
@@ -89,9 +92,15 @@ class _PeopleScreenState extends State<PeopleScreen> {
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(29),
               ),
-              child: const TextField(
+              child: TextField(
+                controller: searchController,
                 textInputAction: TextInputAction.go,
-                decoration: InputDecoration(
+                onChanged: (value) {
+                  setState(() {
+                    searchItem = value;
+                  });
+                },
+                decoration: const InputDecoration(
                   icon: Icon(Icons.search),
                   hintText: 'Search',
                   border: InputBorder.none,
@@ -133,32 +142,68 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                     currentUser()) {
                                   users = userSnapshot.data as UserModel;
                                 }
-                                return ListTile(
-                                  onTap: () async {
-                                    ChatRoomModel? chatroomModel =
-                                        await getChatRoomModel(tappedUser);
+                                // searched item
+                                if (users.name
+                                    .toString()
+                                    .toLowerCase()
+                                    .startsWith(searchItem.toLowerCase())) {
+                                  print("match found");
+                                  return ListTile(
+                                    onTap: () async {
+                                      ChatRoomModel? chatroomModel =
+                                          await getChatRoomModel(tappedUser);
 
-                                    if (chatroomModel != null) {
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ChatRoomScreen(
-                                                    targetUser: tappedUser,
-                                                    chatRoom: chatroomModel,
-                                                  )));
-                                    }
-                                  },
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 15, vertical: 5),
-                                  leading: CircleAvatar(
-                                    radius: 25,
-                                    backgroundImage: NetworkImage(
-                                        users.profilepic.toString()),
-                                  ),
-                                  title: Text(users.name.toString()),
-                                );
+                                      if (chatroomModel != null) {
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ChatRoomScreen(
+                                                      targetUser: tappedUser,
+                                                      chatRoom: chatroomModel,
+                                                    )));
+                                      }
+                                    },
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 5),
+                                    leading: CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: NetworkImage(
+                                          users.profilepic.toString()),
+                                    ),
+                                    title: Text(users.name.toString()),
+                                  );
+                                } else if (searchItem.isEmpty) {
+                                  return ListTile(
+                                    onTap: () async {
+                                      ChatRoomModel? chatroomModel =
+                                          await getChatRoomModel(tappedUser);
+
+                                      if (chatroomModel != null) {
+                                        // ignore: use_build_context_synchronously
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ChatRoomScreen(
+                                                      targetUser: tappedUser,
+                                                      chatRoom: chatroomModel,
+                                                    )));
+                                      }
+                                    },
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 15, vertical: 5),
+                                    leading: CircleAvatar(
+                                      radius: 25,
+                                      backgroundImage: NetworkImage(
+                                          users.profilepic.toString()),
+                                    ),
+                                    title: Text(users.name.toString()),
+                                  );
+                                } else {
+                                  return Container();
+                                }
                               } else {
                                 return Container();
                               }
