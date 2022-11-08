@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:messenger/screens/chatsScreen.dart';
 import 'package:messenger/screens/peopleScreen.dart';
-import 'package:messenger/screens/profileScreen.dart';
+import 'package:messenger/screens/profile/profileScreen.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,11 +15,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-     
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        //brightness: Brightness.dark,
       ),
       home: const HomePage(),
     );
@@ -52,8 +53,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: pages[_selectedIndex],
       bottomNavigationBar: Theme(
-        data: Theme.of(context).copyWith(
-            ),
+        data: Theme.of(context).copyWith(),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
           onTap: _navigateBottonBar,

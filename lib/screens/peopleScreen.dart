@@ -47,11 +47,16 @@ class _PeopleScreenState extends State<PeopleScreen> {
       chatRoom = existingChatroom;
     } else {
       // create new chatroom
-      ChatRoomModel newChatroom =
-          ChatRoomModel(chatroomid: uuid.v1(), lastMessage: "", participants: {
-        uid.toString(): true,
-        targetUser.userId.toString(): true,
-      });
+      ChatRoomModel newChatroom = ChatRoomModel(
+        chatroomid: uuid.v1(), 
+        lastMessage: "", 
+        lastMessageSender: "",
+        participants: {
+          uid.toString(): true,
+          targetUser.userId.toString(): true,
+      },
+      createTime: DateTime.now(),
+      users: [uid.toString(),targetUser.userId.toString()]);
 
       await FirebaseFirestore.instance
           .collection("chatrooms")
@@ -71,7 +76,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
         .collection('users')
         .where("userId", isNotEqualTo: currentUser())
         .snapshots();
-    
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -92,7 +97,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(29),
               ),
-              child: TextField(        
+              child: TextField(
                 controller: searchController,
                 textInputAction: TextInputAction.go,
                 onChanged: (value) {
@@ -131,8 +136,9 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                 ConnectionState.done) {
                               if (userSnapshot.data != null) {
                                 UserModel users = UserModel();
-                                UserModel targetUser = userSnapshot.data as UserModel;
-                                
+                                UserModel targetUser =
+                                    userSnapshot.data as UserModel;
+
                                 if (userSnapshot.data?.userId !=
                                     currentUser()) {
                                   users = userSnapshot.data as UserModel;
@@ -142,7 +148,6 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                     .toString()
                                     .toLowerCase()
                                     .startsWith(searchItem.toLowerCase())) {
-                                  
                                   return ListTile(
                                     onTap: () async {
                                       ChatRoomModel? chatroomModel =

@@ -15,6 +15,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isSwitched = true;
+  bool isDarkMode = false;
   bool isLoading = false;
   String userId = '';
   String userName = '';
@@ -137,11 +138,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     fontSize: 20,
                                   )),
                               trailing: Switch(
-                                value: isSwitched,
+                                value: isDarkMode,
                                 onChanged: (value) {
                                   setState(() {
-                                    isSwitched = value;
-                                    print(isSwitched);
+                                    isDarkMode = value;
+                                    print(isDarkMode);
                                   });
                                 },
                                 activeTrackColor: Colors.orange[200],

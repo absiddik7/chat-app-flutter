@@ -55,6 +55,7 @@ dependencies:
   image_cropper: 3.0.1
   firebase_storage: 11.0.4
   firebase_core_platform_interface: 4.5.2
+  adaptive_theme: ^3.1.1
 
   #firebase_core_platform_interface: 4.5.1 # note removed ^
   #firebase_messaging: ^13.0.4 # previously I only had this which was pulling in 4.5.2 which you do not want

@@ -50,6 +50,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           .set(newMessage.toMap());
 
       widget.chatRoom.lastMessage = msg;
+      widget.chatRoom.lastMessageSender = currentUser();
+      widget.chatRoom.createTime = DateTime.now();
+
       FirebaseFirestore.instance
           .collection("chatrooms")
           .doc(widget.chatRoom.chatroomid)

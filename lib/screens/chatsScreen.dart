@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +31,8 @@ class _ChatsScreenState extends State<ChatsScreen> {
   Widget build(BuildContext context) {
     var chats = FirebaseFirestore.instance
         .collection("chatrooms")
-        .where("participants.${currentUser()}", isEqualTo: true)
+        .where("users", arrayContains: currentUser())
+        .orderBy("createtime")
         .snapshots();
 
     return Scaffold(
@@ -77,6 +80,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
                       return ListView.builder(
                         shrinkWrap: true,
+                        reverse: true,
                         itemCount: chatRoomSnapshot.docs.length,
                         physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, index) {
@@ -129,7 +133,16 @@ class _ChatsScreenState extends State<ChatsScreen> {
                                                 maxLines: 1,
                                                 softWrap: false,
                                                 chatRoomModel.lastMessage
-                                                    .toString())
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: (chatRoomModel
+                                                              .lastMessageSender !=
+                                                          currentUser())
+                                                      ? FontWeight.bold
+                                                      : FontWeight.normal,
+                                                ),
+                                              )
                                             : const Text(
                                                 'Say hi to new friend!',
                                                 style: TextStyle(

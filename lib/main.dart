@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:messenger/mainScreen.dart';
 import 'package:uuid/uuid.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
+
 
 class PostHttpOverrides extends HttpOverrides {
   @override
@@ -24,7 +26,7 @@ void main() async {
       statusBarBrightness: Brightness.dark,
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
-      systemStatusBarContrastEnforced: false,
+     // systemStatusBarContrastEnforced: false,
       systemNavigationBarColor: Colors.white,
     ),
   );
@@ -35,7 +37,9 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    
+    return  const MaterialApp(
+      
       debugShowCheckedModeBanner: false,
       home: MainScreen(),
     );
