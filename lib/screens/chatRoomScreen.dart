@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -66,18 +68,26 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+        ),
+        backgroundColor: Colors.white,
+        elevation: 1,
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Colors.grey[500],
-              backgroundImage:  NetworkImage(
-                 widget.targetUser.profilepic.toString()),
+              backgroundColor: Colors.grey[300],
+              backgroundImage: NetworkImage(
+                widget.targetUser.profilepic.toString(),
+              ),
             ),
             const SizedBox(
               width: 10,
             ),
-            Text(widget.targetUser.name.toString()),
+            Text(
+              widget.targetUser.name.toString(),
+              style: const TextStyle(fontSize: 16, color: Colors.black),
+            ),
           ],
         ),
       ),
@@ -93,8 +103,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       if (snapshot.hasData) {
                         QuerySnapshot dataSnapshot =
                             snapshot.data as QuerySnapshot;
-
                         return ListView.builder(
+                            shrinkWrap: true,
                             reverse: true,
                             itemCount: dataSnapshot.docs.length,
                             itemBuilder: ((context, index) {
@@ -108,23 +118,49 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                                         ? MainAxisAlignment.end
                                         : MainAxisAlignment.start,
                                 children: [
-                                  Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 2),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 10),
-                                      decoration: BoxDecoration(
-                                        color: (currentMessage.sender ==
-                                                currentUser())
-                                            ? Colors.blue
-                                            : Colors.grey,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Text(
-                                        currentMessage.text.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 15, color: Colors.white),
+                                  SizedBox(
+                                      width: 150,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            (currentMessage.sender ==
+                                                    currentUser())
+                                                ? MainAxisAlignment.end
+                                                : MainAxisAlignment.start,
+                                        children: [
+                                          Flexible(
+                                            fit: FlexFit.loose,
+                                            child: Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 2),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 10,
+                                                      horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                color: (currentMessage.sender ==
+                                                        currentUser())
+                                                    ? Colors.indigoAccent[400]
+                                                    : Colors.grey[300],
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              child: Text(
+                                                currentMessage.text.toString(),
+                                                style: TextStyle(
+                                                  fontSize: 17,
+                                                  color:
+                                                      (currentMessage.sender ==
+                                                              currentUser())
+                                                          ? Colors.white
+                                                          : Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       )),
+                                  Container(),
                                 ],
                               );
                             }));
@@ -145,16 +181,19 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                   }),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Flexible(
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                  ),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   child: TextField(
                     controller: messageController,
                     maxLines: null,
@@ -162,17 +201,21 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         border: InputBorder.none, hintText: "Message"),
                   ),
                 ),
-                IconButton(
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: IconButton(
                   onPressed: () {
                     sendMessage();
                   },
                   icon: Icon(
                     Icons.send,
+                    size: 30,
                     color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

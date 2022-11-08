@@ -14,6 +14,9 @@ class ChatsScreen extends StatefulWidget {
 }
 
 class _ChatsScreenState extends State<ChatsScreen> {
+  final searchController = TextEditingController();
+  var searchItem = '';
+
   currentUser() {
     final FirebaseAuth auths = FirebaseAuth.instance;
     final user = auths.currentUser;
@@ -31,7 +34,7 @@ class _ChatsScreenState extends State<ChatsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
           'Chats',
@@ -49,8 +52,15 @@ class _ChatsScreenState extends State<ChatsScreen> {
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(29),
               ),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                controller: searchController,
+                textInputAction: TextInputAction.go,
+                onChanged: (value) {
+                  setState(() {
+                    searchItem = value;
+                  });
+                },
+                decoration: const InputDecoration(
                   icon: Icon(Icons.search),
                   hintText: 'Search',
                   border: InputBorder.none,
@@ -89,35 +99,77 @@ class _ChatsScreenState extends State<ChatsScreen> {
                                   if (userData.data != null) {
                                     UserModel targetUser =
                                         userData.data as UserModel;
-                                    return ListTile(
-                                      onTap: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ChatRoomScreen(
-                                                      targetUser: targetUser,
-                                                      chatRoom: chatRoomModel,
-                                                    )));
-                                      },
-                                      leading: CircleAvatar(
-                                        radius: 25,
-                                        backgroundImage: NetworkImage(
-                                            targetUser.profilepic.toString()),
-                                      ),
-                                      title: Text(targetUser.name.toString()),
-                                      subtitle: (chatRoomModel.lastMessage
-                                                  .toString() !=
-                                              "")
-                                          ? Text(chatRoomModel.lastMessage
-                                              .toString())
-                                          : const Text(
-                                              'Say hi to new friend!',
-                                              style: TextStyle(
-                                                color: Colors.blue,
+
+                                    if (targetUser.name
+                                        .toString()
+                                        .toLowerCase()
+                                        .startsWith(searchItem.toLowerCase())) {
+                                      return ListTile(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ChatRoomScreen(
+                                                        targetUser: targetUser,
+                                                        chatRoom: chatRoomModel,
+                                                      )));
+                                        },
+                                        leading: CircleAvatar(
+                                          radius: 25,
+                                          backgroundImage: NetworkImage(
+                                              targetUser.profilepic.toString()),
+                                        ),
+                                        title: Text(targetUser.name.toString()),
+                                        subtitle: (chatRoomModel.lastMessage
+                                                    .toString() !=
+                                                "")
+                                            ? Text(
+                                                overflow: TextOverflow.fade,
+                                                maxLines: 1,
+                                                softWrap: false,
+                                                chatRoomModel.lastMessage
+                                                    .toString())
+                                            : const Text(
+                                                'Say hi to new friend!',
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                ),
                                               ),
-                                            ),
-                                    );
+                                      );
+                                    } else if (searchItem.isEmpty) {
+                                      return ListTile(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ChatRoomScreen(
+                                                        targetUser: targetUser,
+                                                        chatRoom: chatRoomModel,
+                                                      )));
+                                        },
+                                        leading: CircleAvatar(
+                                          radius: 25,
+                                          backgroundImage: NetworkImage(
+                                              targetUser.profilepic.toString()),
+                                        ),
+                                        title: Text(targetUser.name.toString()),
+                                        subtitle: (chatRoomModel.lastMessage
+                                                    .toString() !=
+                                                "")
+                                            ? Text(chatRoomModel.lastMessage
+                                                .toString())
+                                            : const Text(
+                                                'Say hi to new friend!',
+                                                style: TextStyle(
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                      );
+                                    } else {
+                                      return Container();
+                                    }
                                   } else {
                                     return Container();
                                   }

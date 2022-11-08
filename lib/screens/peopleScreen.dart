@@ -65,16 +65,16 @@ class _PeopleScreenState extends State<PeopleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List ids = [];
+
     var userData = FirebaseFirestore.instance
         .collection('users')
         .where("userId", isNotEqualTo: currentUser())
         .snapshots();
-    List<UserModel> allUsers = [];
-    List ids = [];
-
+    
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
           'People',
@@ -92,7 +92,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                 color: Colors.grey[200],
                 borderRadius: BorderRadius.circular(29),
               ),
-              child: TextField(
+              child: TextField(        
                 controller: searchController,
                 textInputAction: TextInputAction.go,
                 onChanged: (value) {
@@ -122,14 +122,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                           snapshot.data?.docs[index].data()
                               as Map<String, dynamic>);
 
-                      allUsers.add(userModel);
                       ids.add(userModel.userId);
-
-                      UserModel tappedUser = UserModel(
-                        userId: snapshot.data?.docs[index]['userId'],
-                        name: snapshot.data?.docs[index]['name'],
-                        email: snapshot.data?.docs[index]['email'],
-                      );
 
                       return FutureBuilder(
                           future: FirebaseHandler.getUserModelById(ids[index]),
@@ -138,6 +131,8 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                 ConnectionState.done) {
                               if (userSnapshot.data != null) {
                                 UserModel users = UserModel();
+                                UserModel targetUser = userSnapshot.data as UserModel;
+                                
                                 if (userSnapshot.data?.userId !=
                                     currentUser()) {
                                   users = userSnapshot.data as UserModel;
@@ -147,11 +142,11 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                     .toString()
                                     .toLowerCase()
                                     .startsWith(searchItem.toLowerCase())) {
-                                  print("match found");
+                                  
                                   return ListTile(
                                     onTap: () async {
                                       ChatRoomModel? chatroomModel =
-                                          await getChatRoomModel(tappedUser);
+                                          await getChatRoomModel(targetUser);
 
                                       if (chatroomModel != null) {
                                         // ignore: use_build_context_synchronously
@@ -160,7 +155,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     ChatRoomScreen(
-                                                      targetUser: tappedUser,
+                                                      targetUser: targetUser,
                                                       chatRoom: chatroomModel,
                                                     )));
                                       }
@@ -178,7 +173,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                   return ListTile(
                                     onTap: () async {
                                       ChatRoomModel? chatroomModel =
-                                          await getChatRoomModel(tappedUser);
+                                          await getChatRoomModel(targetUser);
 
                                       if (chatroomModel != null) {
                                         // ignore: use_build_context_synchronously
@@ -187,7 +182,7 @@ class _PeopleScreenState extends State<PeopleScreen> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     ChatRoomScreen(
-                                                      targetUser: tappedUser,
+                                                      targetUser: targetUser,
                                                       chatRoom: chatroomModel,
                                                     )));
                                       }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
-import 'package:messenger/loginScreen/login.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:messenger/mainScreen.dart';
 import 'package:uuid/uuid.dart';
@@ -19,20 +19,23 @@ var uuid = const Uuid();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  runApp(MyApp());
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarBrightness: Brightness.dark,
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemStatusBarContrastEnforced: false,
+      systemNavigationBarColor: Colors.white,
+    ),
+  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      // title: 'Messenger',
-      // theme: ThemeData(
-      //   primarySwatch: Colors.blue,
-      // ),
       debugShowCheckedModeBanner: false,
       home: MainScreen(),
     );

@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:messenger/screens/chatsScreen.dart';
 import 'package:messenger/screens/peopleScreen.dart';
 import 'package:messenger/screens/profileScreen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
-  // const HomeScreen(
-  //     {super.key,
-  //     required this.authToken,
-  //     required this.userId,
-  //     required this.userName});
-  // final String? authToken;
-  // final int? userId;
-  // final String? userName;
 
-  // This widget is the root of your application.
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+     
     return MaterialApp(
-      //title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -52,16 +50,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   //title: const Text('FIRE'),
-      //   backgroundColor: Colors.deepPurple[300],
-      // ),
-
       body: pages[_selectedIndex],
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
-            //canvasColor: Colors.green[100],
-            // primaryColor: Colo
             ),
         child: BottomNavigationBar(
           currentIndex: _selectedIndex,
