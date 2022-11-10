@@ -9,11 +9,11 @@ import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -104,16 +104,18 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  Future addUserDetails(
-      String userId, String userName, String userEmail, String profilePic) async {
+  Future addUserDetails(String userId, String userName, String userEmail,
+      String profilePic) async {
     try {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');
       await users.doc(userId).set({
         'userId': userId,
         'name': userName,
         'email': userEmail,
-        'profilepic':profilePic,
+        'profilepic': profilePic,
+        'fcmtoken': fcmToken,
       });
     } catch (e) {
       print(e);

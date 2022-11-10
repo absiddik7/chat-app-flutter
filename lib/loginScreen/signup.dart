@@ -4,6 +4,7 @@ import 'package:messenger/home.dart';
 import 'package:messenger/loginScreen/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
@@ -99,6 +100,8 @@ class _SignupPageState extends State<SignupPage> {
   Future addUserDetails(
       String userId, String userName, String userEmail) async {
     try {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+
       CollectionReference users =
           FirebaseFirestore.instance.collection('users');
       await users.doc(userId).set({
@@ -106,6 +109,7 @@ class _SignupPageState extends State<SignupPage> {
         'name': userName,
         'email': userEmail,
         'profilepic':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGIItLko5CxR0mnm4afjCns7hzcGyJ_TXOErxPosjyr-HEWLNx6KmXq9_hywYIWIFuueM&usqp=CAU',
+        'fcmtoken': fcmToken,
       });
     } catch (e) {
       print(e);
@@ -126,7 +130,7 @@ class _SignupPageState extends State<SignupPage> {
                 height: 20,
               ),
               const Text(
-                "ShareBook",
+                "Messenger",
                 style: TextStyle(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,

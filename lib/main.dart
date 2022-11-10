@@ -7,6 +7,9 @@ import 'package:uuid/uuid.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 
 
+
+var uuid = const Uuid();
+
 class PostHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(context) {
@@ -15,8 +18,6 @@ class PostHttpOverrides extends HttpOverrides {
           (X509Certificate cert, String host, int port) => true;
   }
 }
-
-var uuid = const Uuid();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

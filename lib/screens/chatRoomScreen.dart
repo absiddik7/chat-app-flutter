@@ -7,6 +7,9 @@ import 'package:messenger/main.dart';
 import 'package:messenger/model/chatRoomModel.dart';
 import 'package:messenger/model/messageModel.dart';
 import 'package:messenger/model/userModel.dart';
+import 'package:http/http.dart' as http;
+
+import '../db/firebaseHandler.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   const ChatRoomScreen(
@@ -28,6 +31,44 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     final uid = user?.uid;
 
     return uid;
+  }
+
+  currentUserName() async {
+    return await FirebaseHandler.getUserModelById(currentUser());
+  }
+
+  sendNotification(String title, String body) async {
+    var umodel = await currentUserName();
+    UserModel? userModel = umodel;
+
+    String? sender = userModel?.name!;
+    String? msg = widget.chatRoom.lastMessage;
+    //messageController.text.trim();
+
+    try {
+      await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':
+                'Key=AAAAlLmXLt8:APA91bG1c7hsbJgoxAZCBdqsnDVZW6tTnbIB9aaAjgBYHRSfALYuxg_nY0ANuTAHZy4XuaRUjV7dJiqfPy7UQAL3pYK9vsq6OB7qTZZcMnImbz1yp3Tzwtw4oDLXv7GPr6WXJxUT6PGu'
+          },
+          body: jsonEncode({
+            //'token': widget.targetUser.fcmtoken,
+            'data': {
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'title': sender,
+              'body': msg,
+            },
+            'notification': {
+              'title': sender,
+              'body': msg,
+              'android_channel_id': "com.example.messenger",
+            },
+            'to': widget.targetUser.fcmtoken,
+          }));
+    } catch (e) {
+      //
+    }
   }
 
   sendMessage() async {
@@ -122,7 +163,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                                         : MainAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                      width: 150,
+                                      width: 220,
                                       child: Row(
                                         mainAxisAlignment:
                                             (currentMessage.sender ==
@@ -210,6 +251,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 child: IconButton(
                   onPressed: () {
                     sendMessage();
+                    sendNotification('user name', 'new message');
                   },
                   icon: Icon(
                     Icons.send,
