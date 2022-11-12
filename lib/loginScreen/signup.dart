@@ -130,7 +130,7 @@ class _SignupPageState extends State<SignupPage> {
                 height: 20,
               ),
               const Text(
-                "Messenger",
+                "One Chat",
                 style: TextStyle(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,

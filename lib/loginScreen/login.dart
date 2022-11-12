@@ -137,7 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 20,
               ),
               const Text(
-                "Messenger",
+                "One Chat",
                 style: TextStyle(
                     color: Colors.green,
                     fontWeight: FontWeight.bold,
